@@ -2,4 +2,9 @@ FROM node:18
 
 WORKDIR /app
 COPY . .
-EXPOSE 5173
+
+RUN npm install
+RUN npm run build
+
+EXPOSE 80
+CMD ["npx", "serve", "-s", "dist", "-l", "80"]
