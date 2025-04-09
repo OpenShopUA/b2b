@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 export default function App() {
   const [products, setProducts] = useState([]);
   const [selected, setSelected] = useState([]);
@@ -12,7 +14,7 @@ export default function App() {
   const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
-    axios.get("/api/products")
+    axios.get(`${API_URL}/products`)
       .then(res => {
         const filtered = res.data.filter(p =>
           Number(p.price_uah) > 0 && Number(p.price_usd) > 0
@@ -29,7 +31,7 @@ export default function App() {
   };
 
   const exportSelected = async (format) => {
-    const endpoint = format === "xlsx" ? "/api/export/xlsx" : "/api/export/xml";
+    const endpoint = `${API_URL}/export/${format}`;
     const response = await axios.post(endpoint, selected, {
       responseType: "blob",
     });
@@ -63,7 +65,48 @@ export default function App() {
       <h1 className="text-2xl font-bold mb-4">Каталог товарів</h1>
 
       <div className="flex flex-wrap gap-4 mb-4 items-center">
-        {/* ... фільтри та сортування ... */}
+        <select
+          value={brandFilter}
+          onChange={(e) => setBrandFilter(e.target.value)}
+          className="border px-2 py-1 rounded"
+        >
+          <option value="">Всі бренди</option>
+          {uniqueBrands.map((brand, i) => (
+            <option key={i} value={brand}>{brand}</option>
+          ))}
+        </select>
+
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="border px-2 py-1 rounded"
+        >
+          <option value="">Всі категорії</option>
+          {uniqueCategories.map((cat, i) => (
+            <option key={i} value={cat}>{cat}</option>
+          ))}
+        </select>
+
+        <select
+          value={sortField}
+          onChange={(e) => setSortField(e.target.value)}
+          className="border px-2 py-1 rounded"
+        >
+          <option value="title">Назва</option>
+          <option value="brand">Бренд</option>
+          <option value="category_name">Категорія</option>
+          <option value="price_uah">Ціна</option>
+        </select>
+
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+          className="border px-2 py-1 rounded"
+        >
+          <option value="asc">↑ Зростання</option>
+          <option value="desc">↓ Спадання</option>
+        </select>
+
         <div className="flex gap-2 ml-auto">
           <button
             onClick={() => exportSelected("xlsx")}
