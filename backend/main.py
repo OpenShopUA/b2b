@@ -129,3 +129,39 @@ async def export_selected_products_xml(request: Request, db: Session = Depends(g
         media_type="application/xml",
         headers={"Content-Disposition": "attachment; filename=selected_products.xml"}
     )
+
+
+@app.get("/export/xlsx")
+def export_all_products_xlsx(db: Session = Depends(get_db)):
+    products = db.query(Product).all()
+    data = [p.__dict__ for p in products]
+    for d in data:
+        d.pop('_sa_instance_state', None)
+
+    columns_order = [
+        ("product_code", "ID"),
+        ("title", "Назва товару"),
+        ("category_name", "Категорія"),
+        ("brand", "Бренд"),
+        ("article", "Артикул"),
+        ("price_uah", "Ціна, грн"),
+        ("price_usd", "Ціна, USD"),
+        ("stock", "Залишок"),
+        ("image", "Зображення"),
+    ]
+
+    df = pd.DataFrame([
+        {excel_name: item[db_name] for db_name, excel_name in columns_order}
+        for item in data
+    ])
+
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False)
+    output.seek(0)
+
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=all_products.xlsx"}
+    )
