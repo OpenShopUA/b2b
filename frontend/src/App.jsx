@@ -42,6 +42,13 @@ export default function App() {
     link.click();
   };
 
+  const exportAll = () => {
+    const link = document.createElement("a");
+    link.href = `${API_URL}/export/xlsx`;
+    link.download = "products.xlsx";
+    link.click();
+  };
+
   const filtered = products
     .filter(p => !brandFilter || p.brand === brandFilter)
     .filter(p => !categoryFilter || p.category_name === categoryFilter)
@@ -122,6 +129,13 @@ export default function App() {
           >
             Експорт XML (вибрані)
           </button>
+          <button
+            onClick={exportAll}
+            disabled={selected.length > 0}
+            className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm"
+          >
+            Завантажити весь прайс (XLSX)
+          </button>
         </div>
       </div>
 
@@ -136,8 +150,8 @@ export default function App() {
               <th className="p-2">Категорія</th>
               <th className="p-2">Бренд</th>
               <th className="p-2">Артикул</th>
-              <th className="p-2">Оптова ціна, грн</th>
               <th className="p-2">Оптова ціна, USD</th>
+              <th className="p-2">Оптова ціна, грн</th>
               <th className="p-2">Залишок</th>
             </tr>
           </thead>
