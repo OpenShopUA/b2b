@@ -46,7 +46,9 @@ export default function App() {
     const link = document.createElement("a");
     link.href = `${API_URL}/export/xlsx`;
     link.download = "products.xlsx";
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   };
 
   const filtered = products
@@ -115,27 +117,29 @@ export default function App() {
         </select>
 
         <div className="flex gap-2 ml-auto">
-          <button
-            onClick={() => exportSelected("xlsx")}
-            disabled={selected.length === 0}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
-          >
-            Експорт XLSX (вибрані)
-          </button>
-          <button
-            onClick={() => exportSelected("xml")}
-            disabled={selected.length === 0}
-            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
-          >
-            Експорт XML (вибрані)
-          </button>
-          <button
-            onClick={exportAll}
-            disabled={selected.length > 0}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm"
-          >
-            Завантажити весь прайс (XLSX)
-          </button>
+          {selected.length === 0 ? (
+            <button
+              onClick={exportAll}
+              className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
+            >
+              Завантажити весь прайс (XLSX)
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => exportSelected("xlsx")}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+              >
+                Експорт XLSX (вибрані)
+              </button>
+              <button
+                onClick={() => exportSelected("xml")}
+                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
+              >
+                Експорт XML (вибрані)
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -185,8 +189,8 @@ export default function App() {
                 <td className="p-2">{p.category_name}</td>
                 <td className="p-2">{p.brand}</td>
                 <td className="p-2">{p.article}</td>
-                <td className="p-2">{Number(p.price_uah).toLocaleString()}</td>
                 <td className="p-2">{Number(p.price_usd).toLocaleString()}</td>
+                <td className="p-2">{Number(p.price_uah).toLocaleString()}</td>
                 <td className="p-2">{p.stock}</td>
               </tr>
             ))}
