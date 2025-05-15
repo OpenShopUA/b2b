@@ -122,7 +122,7 @@ export default function App() {
               onClick={exportAll}
               className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
             >
-              Завантажити весь прайс (XLSX) для Анни
+              Завантажити весь прайс (XLSX) 
             </button>
           ) : (
             <>
