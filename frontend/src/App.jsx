@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "";
+// Використовуємо динамічний API_URL з вікна або змінної середовища як запасний варіант
+const API_URL = window.ENV?.API_URL || import.meta.env.VITE_API_URL || "";
 
 export default function App() {
   const [products, setProducts] = useState([]);
