@@ -13,6 +13,7 @@ export default function App() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [sortField, setSortField] = useState("category_name");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     axios.get(`${API_URL}/products`)
@@ -43,13 +44,38 @@ export default function App() {
     link.click();
   };
 
-  const exportAll = () => {
-    const link = document.createElement("a");
-    link.href = `${API_URL}/export/xlsx`;
-    link.download = "products.xlsx";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const exportAll = async () => {
+    try {
+      setLoading(true);
+      // Використовуємо axios для отримання файлу як blob
+      const response = await axios.get(`${API_URL}/export/xlsx`, {
+        responseType: "blob", // Важливо вказати responseType як blob
+      });
+      
+      // Створюємо blob-об'єкт з отриманих даних
+      const blob = new Blob([response.data], { 
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+      });
+      
+      // Створюємо посилання для завантаження
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "products.xlsx";
+      
+      // Симулюємо клік для завантаження
+      document.body.appendChild(link);
+      link.click();
+      
+      // Очищаємо ресурси
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Помилка при експорті файлу:", error);
+      alert("Виникла помилка при завантаженні файлу. Спробуйте пізніше.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filtered = products
@@ -122,8 +148,9 @@ export default function App() {
             <button
               onClick={exportAll}
               className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
+              disabled={loading}
             >
-              Завантажити весь прайс (XLSX) 
+              {loading ? "Завантаження..." : "Завантажити весь прайс (XLSX)"}
             </button>
           ) : (
             <>
