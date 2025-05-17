@@ -47,7 +47,7 @@ frontend:
     type: ClusterIP
     port: 80
   env:
-    VITE_API_URL: "http://price-app-b2b:8000" # URL для бекенду через внутрішню мережу Kubernetes
+    VITE_API_URL: "/api" # Використовуємо відносний URL для API
 
 # Ingress контролер
 ingress:
@@ -57,6 +57,10 @@ ingress:
   hosts:
     - host: b2b.example.com
       paths:
+        - path: /api
+          pathType: Prefix
+          backend: price-app-b2b
+          port: 8000
         - path: /
           pathType: Prefix
           backend: b2b-front
