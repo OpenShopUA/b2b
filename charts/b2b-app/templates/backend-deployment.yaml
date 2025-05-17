@@ -41,16 +41,4 @@ spec:
                   name: {{ .Release.Name }}-postgresql
                   key: DB_PASSWORD
           resources:
-            {{- toYaml .Values.backend.resources | nindent 12 }}
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-            initialDelaySeconds: 15
-            periodSeconds: 20 
+            {{- toYaml .Values.backend.resources | nindent 12 }} 

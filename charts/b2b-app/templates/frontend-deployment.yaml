@@ -30,16 +30,4 @@ spec:
             - name: VITE_API_URL
               value: {{ .Values.frontend.env.VITE_API_URL | quote }}
           resources:
-            {{- toYaml .Values.frontend.resources | nindent 12 }}
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-            initialDelaySeconds: 15
-            periodSeconds: 20 
+            {{- toYaml .Values.frontend.resources | nindent 12 }} 
