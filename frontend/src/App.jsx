@@ -4,6 +4,44 @@ import axios from "axios";
 // Використовуємо динамічний API_URL з вікна або змінної середовища як запасний варіант
 const API_URL = window.ENV?.API_URL || import.meta.env.VITE_API_URL || "";
 
+// Компонент для відображення статусу підключення
+const ConnectionStatus = ({ apiUrl }) => {
+  const [status, setStatus] = useState("перевірка...");
+  const [error, setError] = useState(null);
+  const [productCount, setProductCount] = useState(null);
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        const startTime = Date.now();
+        const response = await axios.get(`${apiUrl}/products`);
+        const endTime = Date.now();
+        const responseTime = endTime - startTime;
+        
+        setProductCount(response.data.length);
+        setStatus(`з'єднано (${responseTime}ms)`);
+        setError(null);
+      } catch (err) {
+        setStatus("помилка");
+        setError(err.message);
+        console.error("Помилка підключення до API:", err);
+      }
+    };
+
+    checkConnection();
+  }, [apiUrl]);
+
+  return (
+    <div className="fixed bottom-0 right-0 bg-white p-2 m-2 shadow-md rounded text-xs z-50 max-w-xs">
+      <div className="font-bold">Статус API з'єднання:</div>
+      <div>URL: {apiUrl}</div>
+      <div>Статус: <span className={status === "з'єднано (${responseTime}ms)" ? "text-green-600" : status === "перевірка..." ? "text-yellow-600" : "text-red-600"}>{status}</span></div>
+      {productCount !== null && <div>Кількість продуктів: {productCount}</div>}
+      {error && <div className="text-red-600 overflow-auto max-h-20">{error}</div>}
+    </div>
+  );
+};
+
 export default function App() {
   const [products, setProducts] = useState([]);
   const [selected, setSelected] = useState([]);
@@ -14,6 +52,7 @@ export default function App() {
   const [sortField, setSortField] = useState("category_name");
   const [sortOrder, setSortOrder] = useState("asc");
   const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState(null);
 
   useEffect(() => {
     axios.get(`${API_URL}/products`)
@@ -22,8 +61,12 @@ export default function App() {
           Number(p.price_uah) > 0 && Number(p.price_usd) > 0
         );
         setProducts(filtered);
+        setApiError(null);
       })
-      .catch(err => console.error("Помилка при отриманні продуктів:", err));
+      .catch(err => {
+        console.error("Помилка при отриманні продуктів:", err);
+        setApiError(`Помилка завантаження: ${err.message}`);
+      });
   }, []);
 
   const toggleSelect = (id) => {
@@ -33,15 +76,23 @@ export default function App() {
   };
 
   const exportSelected = async (format) => {
-    const endpoint = `${API_URL}/export/${format}`;
-    const response = await axios.post(endpoint, selected, {
-      responseType: "blob",
-    });
-    const blob = new Blob([response.data]);
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `products.${format}`;
-    link.click();
+    try {
+      setLoading(true);
+      const endpoint = `${API_URL}/export/${format}`;
+      const response = await axios.post(endpoint, selected, {
+        responseType: "blob",
+      });
+      const blob = new Blob([response.data]);
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `products.${format}`;
+      link.click();
+    } catch (error) {
+      console.error(`Помилка при експорті ${format}:`, error);
+      alert(`Виникла помилка при експорті ${format}. Перевірте консоль для деталей.`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const exportAll = async () => {
@@ -98,7 +149,15 @@ export default function App() {
 
   return (
     <div className="p-4">
+      <ConnectionStatus apiUrl={API_URL} />
+      
       <h1 className="text-2xl font-bold mb-4">Каталог товарів</h1>
+      
+      {apiError && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {apiError}
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-4 mb-4 items-center">
         <select
@@ -157,14 +216,16 @@ export default function App() {
               <button
                 onClick={() => exportSelected("xlsx")}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                disabled={loading}
               >
-                Експорт XLSX (вибрані)
+                {loading ? "Завантаження..." : "Експорт XLSX (вибрані)"}
               </button>
               <button
                 onClick={() => exportSelected("xml")}
                 className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
+                disabled={loading}
               >
-                Експорт XML (вибрані)
+                {loading ? "Завантаження..." : "Експорт XML (вибрані)"}
               </button>
             </>
           )}
