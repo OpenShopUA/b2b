@@ -2,5 +2,5 @@ apiVersion: v2
 name: b2b-app
 description: Helm chart для B2B Price App (Backend + Frontend)
 type: application
-version: 0.1.2
+version: 0.1.3
 appVersion: "1.0.0" 
