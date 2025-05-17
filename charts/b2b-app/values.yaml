@@ -25,6 +25,7 @@ backend:
     DB_PORT: "5432"
     DB_NAME: "b2b_db"
     DB_USER: "user"
+    XML_IMPORT_URL: "https://example.com/export/products.xml"
     # DB_PASSWORD встановлюється через секрет
 
 # Налаштування для Frontend

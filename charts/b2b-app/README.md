@@ -33,6 +33,7 @@ helm install b2b ./b2b-app -f my-values.yaml
 | `backend.env.DB_PORT` | Порт PostgreSQL | `5432` |
 | `backend.env.DB_NAME` | Назва бази даних | `b2b_db` |
 | `backend.env.DB_USER` | Користувач бази даних | `user` |
+| `backend.env.XML_IMPORT_URL` | URL для імпорту XML-файлу | `https://example.com/export/products.xml` |
 | `secrets.postgresql.DB_PASSWORD` | Пароль до бази даних | `change-me` |
 | `frontend.image.repository` | Репозиторій образу для фронтенду | `dreemix/b2b-front` |
 | `frontend.image.tag` | Тег образу для фронтенду | `latest` |
@@ -52,6 +53,7 @@ backend:
     DB_HOST: "prod-postgres.example.com"
     DB_USER: "b2b_user"
     DB_NAME: "b2b_database"
+    XML_IMPORT_URL: "https://my-data-source.company.com/exports/products.xml"
   image:
     tag: "v1.2.3-abcdef"
 
