@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 from sqlalchemy.orm import Session
 from database import SessionLocal, Product
 import re
+import os
 
 
 def parse_int(value):
@@ -27,7 +28,8 @@ def get_text(elem, tag):
 
 
 async def import_products_from_xml_url():
-    url = "https://erp.openshop.ua/media/export/7.xml"
+    # Використовуємо змінну середовища з можливістю вказати значення за замовчуванням
+    url = os.getenv("XML_IMPORT_URL", "https://example.com/export/products.xml")
     response = requests.get(url)
     response.encoding = "utf-8"
 
