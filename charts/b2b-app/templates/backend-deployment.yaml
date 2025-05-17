@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.backend.name }}
+  labels:
+    app: {{ .Values.backend.name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.backend.name }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.backend.name }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Values.backend.name }}
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: DB_HOST
+              value: {{ .Values.backend.env.DB_HOST | quote }}
+            - name: DB_PORT
+              value: {{ .Values.backend.env.DB_PORT | quote }}
+            - name: DB_NAME
+              value: {{ .Values.backend.env.DB_NAME | quote }}
+            - name: DB_USER
+              value: {{ .Values.backend.env.DB_USER | quote }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-postgresql
+                  key: DB_PASSWORD
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20 

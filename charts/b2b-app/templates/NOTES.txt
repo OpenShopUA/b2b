@@ -1,0 +1,19 @@
+Дякуємо за встановлення {{ .Chart.Name }}.
+
+Ваш реліз має ім'я: {{ .Release.Name }}
+
+Для доступу до вашого застосунку:
+
+{{- if .Values.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  {{- range .paths }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+{{- else }}
+  Backend сервіс: kubectl port-forward svc/{{ .Values.backend.name }} {{ .Values.backend.service.port }}:{{ .Values.backend.service.port }}
+  Frontend сервіс: kubectl port-forward svc/{{ .Values.frontend.name }} {{ .Values.frontend.service.port }}:{{ .Values.frontend.service.port }}
+{{- end }}
+
+Для перевірки статусу подів:
+  kubectl get pods -l "release={{ .Release.Name }}" 

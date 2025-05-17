@@ -1,0 +1,73 @@
+# Загальні налаштування
+nameOverride: ""
+fullnameOverride: ""
+
+# Налаштування для Backend
+backend:
+  name: price-app-b2b
+  image:
+    repository: dreemix/price-app-b2b
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  service:
+    type: ClusterIP
+    port: 8000
+  env:
+    DB_HOST: "postgres-host" # Зовнішня PostgreSQL
+    DB_PORT: "5432"
+    DB_NAME: "b2b_db"
+    DB_USER: "user"
+    # DB_PASSWORD встановлюється через секрет
+
+# Налаштування для Frontend
+frontend:
+  name: b2b-front
+  image:
+    repository: dreemix/b2b-front
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+  service:
+    type: ClusterIP
+    port: 80
+  env:
+    VITE_API_URL: "/api" # URL для бекенду
+
+# Ingress контролер
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  hosts:
+    - host: b2b.example.com
+      paths:
+        - path: /api/?(.*)
+          pathType: Prefix
+          backend: price-app-b2b
+          port: 8000
+        - path: /?(.*)
+          pathType: Prefix
+          backend: b2b-front
+          port: 80
+  tls: []
+
+# Налаштування для секретів
+secrets:
+  postgresql:
+    DB_PASSWORD: "change-me" 

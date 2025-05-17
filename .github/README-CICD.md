@@ -28,4 +28,37 @@ git push origin be-v1.0.0
 # Для frontend
 git tag fe-v2.0.0
 git push origin fe-v2.0.0
-``` 
+```
+
+## Розгортання за допомогою Helm
+
+Для розгортання застосунків у Kubernetes використовуйте Helm-чарт, розташований в директорії `charts/b2b-app`.
+
+### Встановлення чарту
+
+```bash
+cd charts
+helm install b2b ./b2b-app
+```
+
+### Оновлення версій образів
+
+Після успішного деплою нових версій образів на Docker Hub, необхідно оновити значення `tag` у файлі `my-values.yaml`:
+
+```yaml
+backend:
+  image:
+    tag: "v1.2.3-abcdef"  # Нова версія бекенду
+
+frontend:
+  image:
+    tag: "v2.0.1-abcdef"  # Нова версія фронтенду
+```
+
+Потім застосуйте оновлення:
+
+```bash
+helm upgrade b2b ./b2b-app -f my-values.yaml
+```
+
+Додаткова інформація про Helm-чарт та його параметри знаходиться в файлі `charts/b2b-app/README.md`. 
