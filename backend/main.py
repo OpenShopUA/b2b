@@ -13,7 +13,8 @@ import io
 import pandas as pd
 from fastapi import Request
 
-app = FastAPI()
+# Змінюємо FastAPI, щоб він працював з префіксом /api
+app = FastAPI(openapi_prefix="/api")
 
 # CORS для фронтенду
 app.add_middleware(
@@ -40,7 +41,7 @@ class ProductOut(BaseModel):
     image: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True # Змінено з orm_mode на from_attributes для Pydantic V2
 
 # Ініціалізація таблиць і імпорт при старті
 @app.on_event("startup")
@@ -63,9 +64,6 @@ def get_products(db: Session = Depends(get_db)):
 @app.post("/import-xml")
 async def import_xml():
     return await import_products_from_xml_url()
-
-
-
 
 @app.post("/export/xlsx")
 async def export_selected_products_xlsx(request: Request, db: Session = Depends(get_db)):
@@ -106,8 +104,6 @@ async def export_selected_products_xlsx(request: Request, db: Session = Depends(
         headers={"Content-Disposition": "attachment; filename=selected_products.xlsx"}
     )
 
-
-
 @app.post("/export/xml")
 async def export_selected_products_xml(request: Request, db: Session = Depends(get_db)):
     ids = await request.json()
@@ -129,7 +125,6 @@ async def export_selected_products_xml(request: Request, db: Session = Depends(g
         media_type="application/xml",
         headers={"Content-Disposition": "attachment; filename=selected_products.xml"}
     )
-
 
 @app.get("/export/xlsx")
 def export_all_products_xlsx(db: Session = Depends(get_db)):
