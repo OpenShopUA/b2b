@@ -54,16 +54,16 @@ ingress:
   enabled: true
   className: "nginx"
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2 # $2 для збереження шляху після /api
-    nginx.ingress.kubernetes.io/use-regex: "true" # Додано для роботи з регулярними виразами
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
   hosts:
     - host: b2b.example.com
       paths:
-        - path: /api(/|$)(.*) # Регулярний вираз для /api та всіх вкладених шляхів
-          pathType: ImplementationSpecific # Змінено для регулярних виразів
+        - path: /api(/|$)(.*)
+          pathType: ImplementationSpecific
           backend: price-app-b2b
           port: 8000
-        - path: /(.*) # Залишаємо цей шлях для фронтенду
+        - path: /()(.*)
           pathType: ImplementationSpecific
           backend: b2b-front
           port: 80
