@@ -83,10 +83,12 @@ export default function App() {
   useEffect(() => {
     axios.get(`${API_URL}/products`)
       .then(res => {
-        const filtered = res.data.filter(p =>
-          Number(p.price_uah) > 0 && Number(p.price_usd) > 0 && Number(p.stock) > 0
-        );
-        setProducts(filtered);
+const filtered = res.data.filter(p =>
+  Number(p.price_uah) > 0 &&
+  Number(p.price_usd) > 0 &&
+  Number(p.stock) > 0
+);
+setProducts(filtered);
         setApiError(null);
       })
       .catch(err => {
