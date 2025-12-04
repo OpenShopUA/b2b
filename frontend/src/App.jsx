@@ -158,6 +158,7 @@ setProducts(filtered);
   };
 
   const filtered = products
+    .filter(p => Number(p.stock) > 0)
     .filter(p => !brandFilter || p.brand === brandFilter)
     .filter(p => !categoryFilter || p.category_name === categoryFilter)
     .sort((a, b) => {
