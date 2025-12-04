@@ -130,7 +130,7 @@ export default function App() {
 
   // 4️⃣ Фільтрація та сортування
   const filtered = products
-    .filter(p => Number(p.stock) > 0) // основний фільтр
+    .filter(p => !isNaN(Number(p.stock)) && Number(p.stock) > 0) // основний фільтр
     .filter(p => !brandFilter || p.brand === brandFilter)
     .filter(p => !categoryFilter || p.category_name === categoryFilter)
     .sort((a, b) => {
