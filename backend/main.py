@@ -14,7 +14,7 @@ import pandas as pd
 from fastapi import Request
 
 # Змінюємо FastAPI, щоб він працював з префіксом /api
-  app = FastAPI(openapi_prefix="/api")
+app = FastAPI(openapi_prefix="/api")
 # app = FastAPI(root_path="/api")
 
 # CORS для фронтенду
