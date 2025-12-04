@@ -39,7 +39,7 @@ const ConnectionStatus = ({ apiUrl }) => {
       <div className="font-bold">Статус API з'єднання:</div>
       <div>URL: {apiUrl}</div>
       <div>Статус: <span className={status.includes("з'єднано") ? "text-green-600" : status === "перевірка..." ? "text-yellow-600" : "text-red-600"}>{status}</span></div>
-      {productCount !== null && <div>Кількість продуктів: {productCount}</div>}
+      {productCount !== null && <div>Кількість 22продуктів: {productCount}</div>}
       {error && <div className="text-red-600 overflow-auto max-h-20">{error}</div>}
 
       {expanded && (
