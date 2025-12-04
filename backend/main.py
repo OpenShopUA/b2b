@@ -160,3 +160,9 @@ def export_all_products_xlsx(db: Session = Depends(get_db)):
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": "attachment; filename=all_products.xlsx"}
     )
+
+@app.delete("/products/zero-stock")
+def delete_zero_stock_products(db: Session = Depends(get_db)):
+    deleted_count = db.query(Product).filter(Product.stock == 0).delete()
+    db.commit()
+    return {"message": f"Видалено {deleted_count} товарів з нульовим залишком"}
