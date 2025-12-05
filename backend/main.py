@@ -168,3 +168,26 @@ def delete_zero_stock_products(db: Session = Depends(get_db)):
     db.commit()
     return {"message": f"Видалено {deleted_count} товарів з нульовим залишком"}
 
+@app.get("/export/xml/all")
+def export_all_products_xml(db: Session = Depends(get_db)):
+    products = db.query(Product).all()
+
+    root = ET.Element("products")
+
+    for p in products:
+        item = ET.SubElement(root, "product")
+        for key in [
+            "product_code", "article", "title", "category", "category_name",
+            "brand", "stock", "price_usd", "image"
+        ]:
+            ET.SubElement(item, key).text = str(getattr(p, key) or "")
+
+    xml_data = ET.tostring(root, encoding="utf-8", xml_declaration=True)
+
+    return Response(
+        content=xml_data,
+        media_type="application/xml",
+        headers={
+            "Content-Disposition": "attachment; filename=all_products.xml"
+        }
+    )
