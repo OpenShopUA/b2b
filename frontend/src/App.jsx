@@ -3,12 +3,10 @@ import axios from "axios";
 
 const API_URL = window.ENV?.API_URL || import.meta.env.VITE_API_URL || "";
 
-{/*// Компонент для статусу з'єднання
 const ConnectionStatus = ({ apiUrl }) => {
   const [status, setStatus] = useState("перевірка...");
   const [error, setError] = useState(null);
   const [productCount, setProductCount] = useState(null);
-  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -17,44 +15,35 @@ const ConnectionStatus = ({ apiUrl }) => {
         const response = await axios.get(`${apiUrl}/products`);
         const endTime = Date.now();
         const responseTime = endTime - startTime;
+
         setProductCount(response.data.length);
         setStatus(`з'єднано (${responseTime}ms)`);
         setError(null);
       } catch (err) {
         setStatus("помилка");
-        setError(err.message + (err.response ? ` (${err.response.status})` : ''));
+        setError(
+          err.message + (err.response ? ` (${err.response.status})` : "")
+        );
       }
     };
 
     checkConnection();
     const interval = setInterval(checkConnection, 30000);
+
     return () => clearInterval(interval);
   }, [apiUrl]);
 
+  //  Компонент виконує всю логіку, але повністю прихований
   return (
-    <div
-      className="fixed bottom-0 right-0 bg-white p-2 m-2 shadow-md rounded text-xs z-50 max-w-xs cursor-pointer"
-      onClick={() => setExpanded(!expanded)}
-    >
-      <div className="font-bold">Статус API з'єднання:</div>
+    <div style={{ display: "none" }}>
       <div>URL: {apiUrl}</div>
-      <div>Статус: <span className={status.includes("з'єднано") ? "text-green-600" : status === "перевірка..." ? "text-yellow-600" : "text-red-600"}>{status}</span></div>
-      {productCount !== null && <div>Кількість 22продуктів: {productCount}</div>}
-      {error && <div className="text-red-600 overflow-auto max-h-20">{error}</div>}
-
-      {expanded && (
-        <div className="mt-2 border-t pt-2">
-          <div className="font-bold">Браузер і URL:</div>
-          <div>Браузер: {navigator.userAgent}</div>
-          <div>Поточна URL: {window.location.href}</div>
-          <div>Host: {window.location.host}</div>
-          <div>Origin: {window.location.origin}</div>
-          <div className="text-gray-500 mt-2 text-[10px]">Клікніть, щоб сховати деталі</div>
-        </div>
-      )}
+      <div>Статус: {status}</div>
+      <div>Кількість продуктів: {productCount}</div>
+      {error && <div>{error}</div>}
     </div>
   );
-};*/}
+};
+
 
 export default function App() {
   const [products, setProducts] = useState([]);
