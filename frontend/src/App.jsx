@@ -3,7 +3,6 @@ import axios from "axios";
 
 const API_URL = window.ENV?.API_URL || import.meta.env.VITE_API_URL || "";
 
-{/*// Компонент для статусу з'єднання*/}
 const ConnectionStatus = ({ apiUrl }) => {
   const [status, setStatus] = useState("перевірка...");
   const [error, setError] = useState(null);
@@ -39,7 +38,7 @@ const ConnectionStatus = ({ apiUrl }) => {
       <div className="font-bold">Статус API з'єднання:</div>
       <div>URL: {apiUrl}</div>
       <div>Статус: <span className={status.includes("з'єднано") ? "text-green-600" : status === "перевірка..." ? "text-yellow-600" : "text-red-600"}>{status}</span></div>
-      {productCount !== null && <div>Кількість 22продуктів: {productCount}</div>}
+      {productCount !== null && <div>Кількість продуктів: {productCount}</div>}
       {error && <div className="text-red-600 overflow-auto max-h-20">{error}</div>}
 
       {expanded && (
@@ -56,7 +55,6 @@ const ConnectionStatus = ({ apiUrl }) => {
   );
 };
 
-
 export default function App() {
   const [products, setProducts] = useState([]);
   const [selected, setSelected] = useState([]);
@@ -67,11 +65,10 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
 
-  // 1️⃣ Завантаження товарів
   useEffect(() => {
     axios.get(`${API_URL}/products`)
       .then(res => {
-        setProducts(res.data); // без фільтрації
+        setProducts(res.data);
         setApiError(null);
       })
       .catch(err => {
@@ -80,14 +77,12 @@ export default function App() {
       });
   }, []);
 
-  // 2️⃣ Вибрані товари
   const toggleSelect = (id) => {
     setSelected(prev =>
       prev.includes(id) ? prev.filter(pid => pid !== id) : [...prev, id]
     );
   };
 
-  // 3️⃣ Експорт
   const exportSelected = async (format) => {
     try {
       setLoading(true);
@@ -129,9 +124,29 @@ export default function App() {
     }
   };
 
-  // 4️⃣ Фільтрація та сортування
+  const exportAllXml = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_URL}/export/xml/all`, {
+        responseType: "blob",
+      });
+      const blob = new Blob([response.data], { type: "application/xml" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "products.xml";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      alert("Помилка при завантаженні XML.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filtered = products
-    .filter(p => !isNaN(Number(p.stock)) && Number(p.stock) > 0) // основний фільтр
+    .filter(p => !isNaN(Number(p.stock)) && Number(p.stock) > 0)
     .filter(p => !brandFilter || p.brand === brandFilter)
     .filter(p => !categoryFilter || p.category_name === categoryFilter)
     .sort((a, b) => {
@@ -158,7 +173,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Фільтри */}
       <div className="flex flex-wrap gap-4 mb-4 items-center">
         <select value={brandFilter} onChange={(e) => setBrandFilter(e.target.value)} className="border px-2 py-1 rounded">
           <option value="">Всі бренди</option>
@@ -184,9 +198,14 @@ export default function App() {
 
         <div className="flex gap-2 ml-auto">
           {selected.length === 0 ? (
-            <button onClick={exportAll} className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm" disabled={loading}>
-              {loading ? "Завантаження..." : "Завантажити весь прайс (XLSX)"}
-            </button>
+            <>
+              <button onClick={exportAll} className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm" disabled={loading}>
+                {loading ? "Завантаження..." : "Завантажити весь прайс (XLSX)"}
+              </button>
+              <button onClick={exportAllXml} className="bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded text-sm" disabled={loading}>
+                {loading ? "Завантаження..." : "Завантажити весь прайс (XML)"}
+              </button>
+            </>
           ) : (
             <>
               <button onClick={() => exportSelected("xlsx")} className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm" disabled={loading}>
@@ -200,7 +219,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Таблиця товарів */}
       <div className="overflow-auto">
         <table className="min-w-full bg-white rounded-xl shadow">
           <thead>
@@ -213,7 +231,6 @@ export default function App() {
               <th className="p-2">Бренд</th>
               <th className="p-2">Артикул</th>
               <th className="p-2">Оптова ціна, USD</th>
-              {/*<th className="p-2">Оптова ціна, грн</th>*/}
               <th className="p-2">Залишок</th> 
             </tr>
           </thead>
@@ -239,7 +256,6 @@ export default function App() {
                 <td className="p-2">{p.brand}</td>
                 <td className="p-2">{p.article}</td>
                 <td className="p-2">{Number(p.price_usd).toLocaleString()}</td>
-                {/*<td className="p-2">{Number(p.price_uah).toLocaleString()}</td>*/}
                 <td className="p-2">{p.stock}</td>
               </tr>
             ))}
