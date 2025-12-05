@@ -213,7 +213,7 @@ export default function App() {
               <th className="p-2">Артикул</th>
               <th className="p-2">Оптова ціна, USD</th>
               <th className="p-2">Оптова ціна, грн</th>
-              <th className="p-2">Залишок</th>
+{/*               <th className="p-2">Залишок</th> */ }
             </tr>
           </thead>
           <tbody>
