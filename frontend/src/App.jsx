@@ -3,7 +3,7 @@ import axios from "axios";
 
 const API_URL = window.ENV?.API_URL || import.meta.env.VITE_API_URL || "";
 
-// Компонент для статусу з'єднання
+{/*// Компонент для статусу з'єднання
 const ConnectionStatus = ({ apiUrl }) => {
   const [status, setStatus] = useState("перевірка...");
   const [error, setError] = useState(null);
@@ -54,7 +54,7 @@ const ConnectionStatus = ({ apiUrl }) => {
       )}
     </div>
   );
-};
+};*/}
 
 export default function App() {
   const [products, setProducts] = useState([]);
@@ -212,8 +212,8 @@ export default function App() {
               <th className="p-2">Бренд</th>
               <th className="p-2">Артикул</th>
               <th className="p-2">Оптова ціна, USD</th>
-              <th className="p-2">Оптова ціна, грн</th>
-{/*               <th className="p-2">Залишок</th> */ }
+              {/*<th className="p-2">Оптова ціна, грн</th>*/}
+              <th className="p-2">Залишок</th> 
             </tr>
           </thead>
           <tbody>
@@ -238,7 +238,7 @@ export default function App() {
                 <td className="p-2">{p.brand}</td>
                 <td className="p-2">{p.article}</td>
                 <td className="p-2">{Number(p.price_usd).toLocaleString()}</td>
-                <td className="p-2">{Number(p.price_uah).toLocaleString()}</td>
+                {/*<td className="p-2">{Number(p.price_uah).toLocaleString()}</td>*/}
                 <td className="p-2">{p.stock}</td>
               </tr>
             ))}
