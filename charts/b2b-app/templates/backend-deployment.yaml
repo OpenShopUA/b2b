@@ -37,6 +37,8 @@ spec:
               value: {{ .Values.backend.env.DB_USER | quote }}
             - name: XML_IMPORT_URL
               value: {{ .Values.backend.env.XML_IMPORT_URL | quote }}
+            - name: UPSTREAM_XML_URL
+              value: {{ .Values.backend.env.UPSTREAM_XML_URL | quote }}
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
