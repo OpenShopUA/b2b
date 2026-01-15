@@ -11,6 +11,9 @@ import xml.etree.ElementTree as ET
 from fastapi.responses import StreamingResponse
 import io
 import pandas as pd
+import os
+import requests
+import zipfile
 from fastapi import Request
 
 # Змінюємо FastAPI, щоб він працював з префіксом /api
@@ -191,3 +194,52 @@ def export_all_products_xml(db: Session = Depends(get_db)):
             "Content-Disposition": "attachment; filename=all_products.xml"
         }
     )
+
+@app.get("/xml")
+def proxy_xml_feed(key: str):
+    # Retrieve the base URL from environment variables
+    # Default is a placeholder. User must Configure UPSTREAM_XML_URL in .env
+    upstream_url = os.getenv("UPSTREAM_XML_URL", "https://portal.b2b-center.com.ua/daily_export_xml_archive.php")
+    
+    # Construct the URL
+    if "{key}" in upstream_url:
+        final_url = upstream_url.format(key=key)
+    else:
+        sep = "&" if "?" in upstream_url else "?"
+        final_url = f"{upstream_url}{sep}key={key}"
+
+    print(f"Fetching from: {final_url}")
+    
+    try:
+        resp = requests.get(final_url, stream=True)
+        # resp.raise_for_status() # Optional: decide if we want to 500 on 404 or pass it through
+        
+        if resp.status_code != 200:
+             return Response(content=f"Upstream error: {resp.status_code}", status_code=resp.status_code)
+
+        try:
+            with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
+                # Find the first XML file
+                xml_files = [f for f in z.namelist() if f.endswith(".xml")]
+                if not xml_files:
+                    return Response(content="No XML file found in ZIP", status_code=502)
+                
+                # Extract content
+                xml_content = z.read(xml_files[0])
+                
+                return Response(
+                    content=xml_content,
+                    media_type="application/xml",
+                    headers={"Content-Disposition": f"attachment; filename={xml_files[0]}"}
+                )
+        except zipfile.BadZipFile:
+            print("Not a zip file, returning content as is.")
+            return Response(
+                content=resp.content,
+                media_type="application/xml",
+                headers={"Content-Disposition": "attachment; filename=feed.xml"}
+            )
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return Response(content=f"Error processing upstream: {str(e)}", status_code=500)
