@@ -254,7 +254,6 @@ export default function App() {
                 <td className="p-2">{p.category_name}</td>
                 <td className="p-2">{p.brand}</td>
                 <td className="p-2">{p.article}</td>
-                <td className="p-2">{Number(p.price_usd).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
