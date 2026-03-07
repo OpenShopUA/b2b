@@ -231,6 +231,7 @@ export default function App() {
               <th className="p-2">Бренд</th>
               <th className="p-2">Артикул</th>
               <th className="p-2">Оптова ціна, USD</th>
+              <th className="p-2">Залишок</th> 
             </tr>
           </thead>
           <tbody>
@@ -254,6 +255,8 @@ export default function App() {
                 <td className="p-2">{p.category_name}</td>
                 <td className="p-2">{p.brand}</td>
                 <td className="p-2">{p.article}</td>
+                <td className="p-2">{Number(p.price_usd).toLocaleString()}</td>
+                <td className="p-2">{p.stock}</td>
               </tr>
             ))}
           </tbody>
